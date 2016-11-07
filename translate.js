@@ -26,20 +26,72 @@ function process_story(story_elem) {
 	var story_content = story.find(".userContent");
 
 	if (story_content.length == 0) {
+		// if there is no userContent div, then the story is empty or not loaded
 		return;
 	}
-
-	//console.log(story.get(0));
-	//console.log(story_content);
 
 	processed_stories.push(story_elem.id);
 
 	//using french version to force translation on many stories, for testing
 	var div_translate = story_content.find("a:contains('Voir la traduction')");
+
 	if (div_translate.length == 0) {
+		// if the translation option isn't displayed, ignore the story
 		return;
 	}
 
-	console.log(story_elem);	
+	var story_text = "";
+	story_content.children("div").children("p").each(function(index) {
+		story_text = story_text + $(this).text();
+	});
 
+	translate(story_text);
+
+	story_content.children("div").append('<div><a href="#" role="button">Voir la traduction Google</a></div>');
+	console.log(story_content);
 }
+
+// translation function
+
+/* Written by Amit Agarwal */
+/* web: ctrlq.org          */
+
+// https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&targetLang=en&dt=t&q=Bonjour
+function translate(sourceText) {
+  
+	var sourceLang = 'auto'; 
+	var targetLang = 'fr';
+
+	var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" 
+		+ sourceLang + "&tl=" + targetLang + "&dt=t&q=" + encodeURI(sourceText);
+	
+	var xmlHttp = new XMLHttpRequest();  
+   
+	xmlHttp.onreadystatechange = function() { 
+		if (xmlHttp.readyState === XMLHttpRequest.DONE && xmlHttp.status === 200) {
+			//var data = JSON.parse(xmlHttp.responseText);
+			console.log(xmlHttp);
+
+			var regex = /(["'])(?:(?=(\\?))\2.)*?\1/;
+
+			var translation = regex.exec(xmlHttp.responseText);
+			var translated_string = translation[0].slice(1, -1);
+			console.log(translated_string);
+
+			/*
+			rating = data.imdbRating;
+
+			if (rating == undefined) {
+				rating = "N/A";
+			}
+			
+			element.html('<b>' + rating + '</b>\xa0' + year);
+			*/
+		}
+	};
+
+	xmlHttp.open('GET', url, true);
+	xmlHttp.send();
+}
+
+
