@@ -45,9 +45,13 @@ function process_story(story_elem) {
 		story_text = story_text + $(this).text();
 	});
 
-	translate(story_text);
-
+	story_content.children("div").append('<div><div><span><div id="translated_text"></div></span></div></div>');
 	story_content.children("div").append('<div><a href="#" role="button">Voir la traduction Google</a></div>');
+
+	var translated_elem = story_content.find("div[id='translated_text']");
+
+	translate(story_text, translated_elem);
+
 	console.log(story_content);
 }
 
@@ -57,7 +61,7 @@ function process_story(story_elem) {
 /* web: ctrlq.org          */
 
 // https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&targetLang=en&dt=t&q=Bonjour
-function translate(sourceText) {
+function translate(sourceText, elem) {
   
 	var sourceLang = 'auto'; 
 	var targetLang = 'fr';
@@ -77,6 +81,8 @@ function translate(sourceText) {
 			var translation = regex.exec(xmlHttp.responseText);
 			var translated_string = translation[0].slice(1, -1);
 			console.log(translated_string);
+
+			elem.html(translated_string);
 
 			/*
 			rating = data.imdbRating;
