@@ -40,19 +40,26 @@ function process_story(story_elem) {
 		return;
 	}
 
-	var story_text = "";
-	story_content.children("div").children("p").each(function(index) {
-		story_text = story_text + $(this).text();
-	});
-
-	story_content.children("div").append('<div><div><span><div id="translated_text"></div></span></div></div>');
-	story_content.children("div").append('<div><a href="#" role="button">Voir la traduction Google</a></div>');
-
-	var translated_elem = story_content.find("div[id='translated_text']");
-
-	translate(story_text, translated_elem);
-
+	var i;
+	var story_text;
+	var cur_story;
 	console.log(story_content);
+	for (i = 0; i < story_content.length; i++) {
+		console.log(story_content[i]);
+		cur_story = $(story_content[i]);
+		story_text = "";
+		cur_story.children("div").children("p").each(function(index) {
+			story_text = story_text + $(this).text();
+		});
+
+		cur_story.children("div").append('<div><div><span><div id="translated_text"></div></span></div></div>');
+		cur_story.children("div").append('<div><a href="#" role="button">Voir la traduction Google</a></div>');
+
+		var translated_elem = cur_story.find("div[id='translated_text']");
+
+		translate(story_text, translated_elem);
+
+	}
 }
 
 // translation function
