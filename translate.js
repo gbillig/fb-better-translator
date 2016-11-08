@@ -13,7 +13,7 @@ var observer = new MutationObserver(function(mutations) {
 		}
 	}
 
-	});    
+	});
 });
 
 var config = { attributes: true, childList: true, characterData: true, subtree: true};
@@ -62,42 +62,70 @@ function process_story(story_elem) {
 
 // https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&targetLang=en&dt=t&q=Bonjour
 function translate(sourceText, elem) {
-  
+
 	var sourceLang = 'auto'; 
 	var targetLang = 'fr';
 
 	var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" 
-		+ sourceLang + "&tl=" + targetLang + "&dt=t&q=" + encodeURI(sourceText);
+		+ sourceLang + "&tl=" + targetLang + "&dt=t&q=" + encodeURIComponent(sourceText);
 	
-	var xmlHttp = new XMLHttpRequest();  
-   
+	var xmlHttp = new XMLHttpRequest();
+
 	xmlHttp.onreadystatechange = function() { 
 		if (xmlHttp.readyState === XMLHttpRequest.DONE && xmlHttp.status === 200) {
 			//var data = JSON.parse(xmlHttp.responseText);
 			console.log(xmlHttp);
 
-			var regex = /(["'])(?:(?=(\\?))\2.)*?\1/;
-
-			var translation = regex.exec(xmlHttp.responseText);
-			var translated_string = translation[0].slice(1, -1);
+			var translated_string = translate_parse(xmlHttp.responseText);
 			console.log(translated_string);
-
 			elem.html(translated_string);
-
-			/*
-			rating = data.imdbRating;
-
-			if (rating == undefined) {
-				rating = "N/A";
-			}
-			
-			element.html('<b>' + rating + '</b>\xa0' + year);
-			*/
 		}
 	};
 
 	xmlHttp.open('GET', url, true);
 	xmlHttp.send();
+}
+
+function translate_parse(input) {
+	var length = input.length;
+	if (length < 3) {
+		return;
+	}
+
+	var result = '';
+	var is_segment = false;
+	var a;
+	var b = input[0]
+	var c = input[1]
+	var d = input[2];
+
+	var i;
+	for (i = 3; i < length; i++) {
+		a = b;
+		b = c;
+		c = d;
+		d = input[i];
+
+		if (is_segment) {
+			if (c == '"' && d == ',') {
+				is_segment = false;
+			} else {
+				result = result + c;
+			}
+		}
+
+		if (c == "[" && d == '"') {
+			i++;
+			d = input[i];
+			is_segment = true;
+		}
+	
+		if (a == ',' && b == ',' && c == ',' && d == ',') {
+			break;
+		}
+	}
+
+	return result;
 }
 
 
