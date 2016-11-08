@@ -83,8 +83,9 @@ function translate(sourceText, elem) {
 			//var data = JSON.parse(xmlHttp.responseText);
 			console.log(xmlHttp);
 
-			var decoded_response = decodeURIComponent(xmlHttp.responseText);
-			var response = decoded_response.replace(
+			//var decoded_response = decodeURIComponent(xmlHttp.responseText);
+			var response = xmlHttp.responseText;
+			response = response.replace(
 							/\\u([0-9a-f]{4})/g, 
 							function (whole, group1) {
 								return String.fromCharCode(parseInt(group1, 16));
@@ -141,5 +142,4 @@ function translate_parse(input) {
 
 	return result;
 }
-
 
